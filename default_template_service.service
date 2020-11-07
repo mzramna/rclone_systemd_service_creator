@@ -1,0 +1,28 @@
+# /etc/systemd/system/{{remote_name}}.service
+[Unit]
+Description={{remote_name}} (rclone)
+AssertPathIsDirectory=/mnt/{{remote_name}}
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/rclone mount \
+        --config={{config_dir}} \
+        --allow-other \
+        --cache-tmp-upload-path=/tmp/rclone/upload \
+        --cache-chunk-path=/tmp/rclone/chunks \
+        --cache-workers=8 \
+        --cache-writes \
+        --cache-dir=/tmp/rclone/vfs \
+        --cache-db-path=/tmp/rclone/db \
+        --no-modtime \
+        --stats=0 \
+        --checkers=16 \
+        --bwlimit=40M \
+        --dir-cache-time=60m \
+        --cache-info-age=60m {{remote_name}}:/ /mnt/{{remote_name}}
+ExecStop=/bin/fusermount -u /mnt/{{remote_name}}
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
