@@ -1,7 +1,7 @@
 # /etc/systemd/system/{{remote_name}}.service
 [Unit]
 Description={{remote_name}} (rclone)
-AssertPathIsDirectory=/mnt/{{remote_name}}
+AssertPathIsDirectory={{rclone_folder}}{{remote_name}}
 
 [Service]
 Type=simple
@@ -19,8 +19,8 @@ ExecStart=/usr/bin/rclone mount \
         --checkers=16 \
         --bwlimit=40M \
         --dir-cache-time=60m \
-        --cache-info-age=60m {{remote_name}}:/ /mnt/{{remote_name}}
-ExecStop=/bin/fusermount -u /mnt/{{remote_name}}
+        --cache-info-age=60m {{remote_name}}:/ {{rclone_folder}}{{remote_name}}
+ExecStop=/bin/fusermount -u {{rclone_folder}}{{remote_name}}
 Restart=always
 RestartSec=10
 
