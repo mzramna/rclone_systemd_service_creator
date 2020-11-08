@@ -1,7 +1,7 @@
 FROM alpine:latest
 
 ENV RCLONE_CONFIG_FILE="/config/rclone.conf"
-
+ENV RCLONE_MOUNT_FOLDER="/media/rclone"
 VOLUME /media/rclone
 VOLUME /config
 
