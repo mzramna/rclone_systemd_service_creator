@@ -41,7 +41,7 @@ def create_service_files(config="./rclone.conf", rclone_mount_folder="/media/rcl
                                                                                                 rclone_mount_folder))
 
 
-def install_services(rclone_mount_folder="/media/rclone/", config="./rclone.conf",
+def install_services(rclone_mount_folder="/media/rclone/",
                      systemd_folder="/etc/systemd/system/"):
     os.mkdir(rclone_mount_folder)
     for i in glob.glob("*.service"):
@@ -57,8 +57,8 @@ def start_webdav_server(config="./rclone.conf", rclone_mount_folder="/media/rclo
     return retorno
 
 
-# config_file = os.environ['RCLONE_CONFIG_FILE']
-
-create_service_files()
-install_services()
-# start_webdav_server()
+config_file = os.environ['RCLONE_CONFIG_FILE']
+rclone_folder=os.environ['RCLONE_MOUNT_FOLDER']
+create_service_files(config=config_file)
+install_services(rclone_mount_folder=rclone_folder)
+start_webdav_server(config=config_file,rclone_mount_folder=rclone_folder)
