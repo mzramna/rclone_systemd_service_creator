@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-import re
-import subprocess
 import glob
-import shutil, os
+import os
+import re
 import shlex
+import shutil
+import subprocess
 
 
 def run_command(command):
@@ -41,7 +42,7 @@ def create_service_files(config="./rclone.conf", rclone_mount_folder="/media/rcl
                                                                                                 rclone_mount_folder))
 
 
-def install_services(rclone_mount_folder="/media/rclone/", config="./rclone.conf",
+def install_services(rclone_mount_folder="/media/rclone/",
                      systemd_folder="/etc/systemd/system/"):
     os.mkdir(rclone_mount_folder)
     for i in glob.glob("*.service"):
@@ -58,7 +59,7 @@ def start_webdav_server(config="./rclone.conf", rclone_mount_folder="/media/rclo
 
 
 # config_file = os.environ['RCLONE_CONFIG_FILE']
-
+# rclone_folder = os.environ['RCLONE_MOUNT_FOLDER']
 create_service_files()
 install_services()
-# start_webdav_server()
+start_webdav_server()
