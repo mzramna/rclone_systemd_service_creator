@@ -1,23 +1,45 @@
 #!/usr/bin/env python
 import re
 import subprocess
+import glob
+import shutil,os
+
+
+def list_rclone_services(config="./rclone.conf"):
+    cmd = ["rclone", "listremotes", "--config=" + config, "--long"]
+    output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
+    output = re.compile("b\'(.*)\'").findall(str(output))[0].split("\\n")[0:-1]
+    for i in range(0, len(output)):
+        print(output[i])
+        output[i] = output[i].split(":")
+        output[i][1] = output[i][1].replace(" ", "")
+    return output
+
+
+def create_service_files(config="./rclone.conf", rclone_mount_folder="/media/rclone/"):
+    output = list_rclone_services(config)
+    #print(output)
+    template = open("./default_template_service.service").read()
+    #print(template)
+    for i in output:
+        service = open("./rclone_" + i[0] + ".service", "a")
+        service.write(
+            template.replace("{{remote_name}}", i[0]).replace("{{config_dir}}", config).replace("{{rclone_folder}}",
+                                                                                                rclone_mount_folder))
+
+
+def install_services(rclone_mount_folder="/media/rclone/", config="./rclone.conf",
+                     systemd_folder="/etc/systemd/system/"):
+    os.mkdir(rclone_mount_folder)
+    for i in glob.glob("*.service"):
+        shutil.move(i, systemd_folder + i)
+        #print(systemd_folder + i)
+        os.mkdir(rclone_mount_folder+i.replace(".service","").replace("rclone_",""))
+        #print(rclone_mount_folder+i.replace(".service","").replace("rclone_",""))
+
+
 
 # config_file = os.environ['RCLONE_CONFIG_FILE']
-config = "./rclone.conf"
-rclone_mount_folder = "/media/rclone/"
-# print(rc.RClone(config_path="./rclone.conf",binary_path="rclone.exe").about())
-cmd = ["rclone", "listremotes", "--config=" + config, "--long"]
-output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
-output = re.compile("b\'(.*)\'").findall(str(output))[0].split("\\n")[0:-1]
-for i in range(0, len(output)):
-    print(output[i])
-    output[i] = output[i].split(":")
-    output[i][1] = output[i][1].replace(" ", "")
-print(output)
-template = open("./default_template_service.service").read()
-print(template)
-for i in output:
-    service = open("./" + i[0] + ".service", "a")
-    service.write(
-        template.replace("{{remote_name}}", i[0]).replace("{{config_dir}}", config).replace("{{rclone_folder}}",
-                                                                                            rclone_mount_folder))
+
+create_service_files()
+install_services()
